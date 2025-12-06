@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دمج الصورة مع الفريم</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101820;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+
+    #frameCanvas {
+      max-width: 95%;
+      margin-top: 25px;
+      border: 2px solid #333;
+    }
+
+    .upload {
+      margin: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>ارفع صورتك ليتم دمجها داخل الفريم</h2>
+
+  <div class="upload">
+    <input type="file" id="imgUpload" accept="image/*">
+    <button onclick="generate()">دمج الصورة</button>
+    <button onclick="downloadImage()">تحميل الناتج</button>
+  </div>
+
+  <canvas id="frameCanvas"></canvas>
+
+  <script>
+    const frameImg = new Image();
+    frameImg.src = "frame.png"; // مهم: لازم تكون الصورة بنفس الاسم
+
+    function generate() {
+      const file = document.getElementById("imgUpload").files[0];
+      if (!file) return alert("من فضلك ارفع صورة أولاً");
+
+      const userImg = new Image();
+      userImg.src = URL.createObjectURL(file);
+
+      userImg.onload = () => {
+        const canvas = document.getElementById("frameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = frameImg.width;
+        canvas.height = frameImg.height;
+
+        // نرسم صورة المستخدم
+        ctx.drawImage(userImg, 0, 0, canvas.width, canvas.height);
+
+        // نرسم الفريم فوق الصورة
+        frameImg.onload = () => {
+          ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+        };
+        ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+      };
+    }
+
+    function downloadImage() {
+      const canvas = document.getElementById("frameCanvas");
+      const link = document.createElement("a");
+      link.download = "final_image.png";
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
